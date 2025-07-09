@@ -2,14 +2,244 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>File Mã Hoá</title>
+  <title>MenuLock Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { background: #000; color: #0ff; text-align: center; font-family: monospace; }
-    iframe { width: 100%; height: 95vh; border: none; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff;
+      color: #000;
+    }
+
+    .marquee {
+      background-color: red;
+      color: white;
+      padding: 6px;
+      font-weight: bold;
+      text-align: center;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll-left 15s linear infinite;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .bubble-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: red;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 15px red;
+      cursor: pointer;
+      z-index: 9999;
+    }
+
+    .menu-container {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 16/9;
+      margin: 0 auto;
+      padding: 10px;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .menu-container.show {
+      display: block;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .box {
+      border: 2px solid red;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    .btn-toggle {
+      background-color: #ccc;
+      color: black;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-toggle.active {
+      background-color: red;
+      color: white;
+      box-shadow: 0 0 8px red;
+    }
+
+    .switch-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .status-log {
+      font-size: 15px;
+      color: green;
+      font-weight: bold;
+      padding-top: 8px;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .note span {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .menu-container {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>🚀 AIMLOCK</h2>
-  <iframe src="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InZpIj4KPGhlYWQ+CiAgPG1ldGEgY2hhcnNldD0iVVRGLTgiIC8+CiAgPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiLz4KICA8dGl0bGU+TWVudSBDaOG7qWMgTsSDbmcgRnJlZSBGaXJlPC90aXRsZT4KICA8c3R5bGU+CiAgICBib2R5IHsKICAgICAgbWFyZ2luOiAwOwogICAgICBmb250LWZhbWlseTogJ1NlZ29lIFVJJywgc2Fucy1zZXJpZjsKICAgICAgYmFja2dyb3VuZDogIzAwMDsKICAgICAgY29sb3I6ICMwZmY7CiAgICAgIGRpc3BsYXk6IGZsZXg7CiAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyOwogICAgICBhbGlnbi1pdGVtczogZmxleC1zdGFydDsKICAgICAgaGVpZ2h0OiAxMDB2aDsKICAgICAgb3ZlcmZsb3c6IGhpZGRlbjsKICAgIH0KICAgIC5jb250YWluZXIgewogICAgICBtYXJnaW4tdG9wOiAyMHB4OwogICAgICBkaXNwbGF5OiBmbGV4OwogICAgICBnYXA6IDIwcHg7CiAgICAgIGJhY2tncm91bmQ6ICMxMTE7CiAgICAgIHBhZGRpbmc6IDIwcHg7CiAgICAgIGJvcmRlci1yYWRpdXM6IDIwcHg7CiAgICAgIGJveC1zaGFkb3c6IDAgMCAyMHB4ICMwZmY7CiAgICB9CiAgICAubWVudSwgLmluZm8tYm94IHsKICAgICAgZmxleDogMTsKICAgICAgcGFkZGluZzogMjBweDsKICAgICAgYmFja2dyb3VuZDogIzAwMDsKICAgICAgYm9yZGVyLXJhZGl1czogMTVweDsKICAgICAgYm94LXNoYWRvdzogaW5zZXQgMCAwIDEwcHggIzBmZjsKICAgIH0KICAgIC5tZW51IGgyLCAuaW5mby1ib3ggaDMgewogICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7CiAgICAgIGNvbG9yOiAjMGZmOwogICAgfQogICAgLmJ0biB7CiAgICAgIGRpc3BsYXk6IGJsb2NrOwogICAgICBtYXJnaW46IDEwcHggYXV0bzsKICAgICAgcGFkZGluZzogMTVweDsKICAgICAgYmFja2dyb3VuZDogIzExMTsKICAgICAgY29sb3I6ICMwZmY7CiAgICAgIGJvcmRlcjogMnB4IHNvbGlkICMwZmY7CiAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7CiAgICAgIGZvbnQtd2VpZ2h0OiBib2xkOwogICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7CiAgICAgIHRyYW5zaXRpb246IDAuM3M7CiAgICB9CiAgICAuYnRuOmhvdmVyIHsKICAgICAgYmFja2dyb3VuZDogIzBmZjsKICAgICAgY29sb3I6ICMwMDA7CiAgICAgIGJveC1zaGFkb3c6IDAgMCAxMHB4ICMwZmY7CiAgICB9CiAgICAuYnRuLmFjdGl2ZSB7CiAgICAgIGJhY2tncm91bmQ6ICMwZmY7CiAgICAgIGNvbG9yOiAjMDAwOwogICAgfQogICAgI3Byb2dyZXNzLWNvbnRhaW5lciB7CiAgICAgIHdpZHRoOiAxMDAlOwogICAgICBoZWlnaHQ6IDEwcHg7CiAgICAgIGJhY2tncm91bmQ6ICMyMjI7CiAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7CiAgICAgIG92ZXJmbG93OiBoaWRkZW47CiAgICAgIG1hcmdpbi10b3A6IDE1cHg7CiAgICB9CiAgICAjcHJvZ3Jlc3MtYmFyIHsKICAgICAgd2lkdGg6IDAlOwogICAgICBoZWlnaHQ6IDEwMCU7CiAgICAgIGJhY2tncm91bmQ6IGxpbWU7CiAgICAgIHRyYW5zaXRpb246IHdpZHRoIDAuMnM7CiAgICB9CiAgICAjcGVyY2VudCB7CiAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICAgICAgZm9udC13ZWlnaHQ6IGJvbGQ7CiAgICAgIG1hcmdpbi10b3A6IDVweDsKICAgIH0KICAgICNmb290ZXIgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgICAgIGJvdHRvbTogMTBweDsKICAgICAgd2lkdGg6IDEwMCU7CiAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICAgICAgZm9udC1zaXplOiAxNHB4OwogICAgICBjb2xvcjogIzBmZjsKICAgICAgYW5pbWF0aW9uOiBzY3JvbGwgMTBzIGxpbmVhciBpbmZpbml0ZTsKICAgIH0KICAgIEBrZXlmcmFtZXMgc2Nyb2xsIHsKICAgICAgMCUgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoMTAwJSk7IH0KICAgICAgMTAwJSB7IHRyYW5zZm9ybTogdHJhbnNsYXRlWCgtMTAwJSk7IH0KICAgIH0KICA8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5PgogIDxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CiAgICA8ZGl2IGNsYXNzPSJtZW51Ij4KICAgICAgPGgyPuKame+4jyBNRU5VIENI4buoQyBOxIJORzwvaDI+CiAgICAgIDxkaXYgaWQ9ImJ1dHRvbnMiPgogICAgICAgIDxidXR0b24gY2xhc3M9ImJ0biIgb25jbGljaz0idG9nZ2xlRmVhdHVyZSh0aGlzLCAnQWltbG9jaycpIj5BaW1sb2NrPC9idXR0b24+CiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIiBvbmNsaWNrPSJ0b2dnbGVGZWF0dXJlKHRoaXMsICdGaXggUnVuZycpIj5GaXggUnVuZzwvYnV0dG9uPgogICAgICAgIDxidXR0b24gY2xhc3M9ImJ0biIgb25jbGljaz0idG9nZ2xlRmVhdHVyZSh0aGlzLCAnTmjhurkgVMOibScpIj5OaOG6uSBUw6JtPC9idXR0b24+CiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIiBvbmNsaWNrPSJ0b2dnbGVGZWF0dXJlKHRoaXMsICdCw6FtIMSQ4bqndScpIj5Cw6FtIMSQ4bqndTwvYnV0dG9uPgogICAgICAgIDxidXR0b24gY2xhc3M9ImJ0biIgb25jbGljaz0idG9nZ2xlRmVhdHVyZSh0aGlzLCAnU21vb3RoJykiPlNtb290aDwvYnV0dG9uPgogICAgICA8L2Rpdj4KICAgICAgPGRpdiBpZD0icHJvZ3Jlc3MtY29udGFpbmVyIj4KICAgICAgICA8ZGl2IGlkPSJwcm9ncmVzcy1iYXIiPjwvZGl2PgogICAgICA8L2Rpdj4KICAgICAgPGRpdiBpZD0icGVyY2VudCI+Q2jGsGEgY8OzIGNo4bupYyBuxINuZyBuw6BvIGNo4bqheTwvZGl2PgogICAgPC9kaXY+CgogICAgPGRpdiBjbGFzcz0iaW5mby1ib3giPgogICAgICA8aDM+8J+ThCBUaMO0bmcgVGluIENo4bupYyBOxINuZzwvaDM+CiAgICAgIDxkaXYgaWQ9ImluZm8iPvCfkYkgTmjhuqVuIGNo4bupYyBuxINuZyDEkeG7gyB4ZW0gY2hpIHRp4bq/dC48L2Rpdj4KCiAgICAgIDxociBzdHlsZT0iYm9yZGVyOiAxcHggZGFzaGVkICMwZmY7IG1hcmdpbjogMTVweCAwOyIgLz4KCiAgICAgIDxoMz7wn5OxIFBow6JuIFTDrWNoIFRoaeG6v3QgQuG7izwvaDM+CiAgICAgIDxkaXY+CiAgICAgICAg8J+TsiBI4bqgTjogMk9CIDxicj4KICAgICAgICDwn5qAIEjhu5YgVFLhu6I6IEFORFJPSSAmIElQSE9ORTxicj4KICAgICAgICDwn5SLIEtow7RuZyBOw6puIGTDuW5nIGtoaSBwaW4gPiAyMCUKICAgICAgPC9kaXY+CgogICAgICA8aHIgc3R5bGU9ImJvcmRlcjogMXB4IGRhc2hlZCAjMGZmOyBtYXJnaW46IDE1cHggMDsiIC8+CgogICAgICA8aDM+4pqg77iPIEzGsHUgw50gS2hpIFPhu60gROG7pW5nPC9oMz4KICAgICAgPGRpdj4KICAgICAgICDinJTvuI8gQuG6rXQgc2F1IGtoaSB2w6BvIGdhbWU8YnI+CiAgICAgICAg4p2MIEtow7RuZyBjaOG7iW5oIGtoaSDEkWFuZyBjaMahaTxicj4KICAgICAgICDwn5uh77iPIEtow7RuZyBjYW4gdGhp4buHcCBk4buvIGxp4buHdSBnYW1lCiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgPC9kaXY+CgogIDxkaXYgaWQ9ImZvb3RlciI+PHN0cm9uZz4mbHQ7IELhuqJOIFFVWeG7gE4gQ+G7pkEgTUlOSCDEkOG7qEMgKCBUQUJJICkgVElLVE9LOiBNRFVDRk9STUVOIOKAkyBD4bqiTSDGoE4gQU5IIEVNICZndDs8L3N0cm9uZz48L2Rpdj4KCiAgPGF1ZGlvIGlkPSJzb3VuZCIgc3JjPSJodHRwczovL3d3dy5teWluc3RhbnRzLmNvbS9tZWRpYS9zb3VuZHMvdGh1bmRlcnN0cmlrZS5tcDMiPjwvYXVkaW8+CgogIDxzY3JpcHQ+CiAgICBjb25zdCBhY3RpdmVTdGF0ZXMgPSB7fTsKCiAgICBmdW5jdGlvbiBzaW11bGF0ZVBpbmcoKSB7CiAgICAgIHJldHVybiBNYXRoLmZsb29yKE1hdGgucmFuZG9tKCkgKiA0MCkgKyA1MDsKICAgIH0KCiAgICBmdW5jdGlvbiB0b2dnbGVGZWF0dXJlKGJ1dHRvbiwgbmFtZSkgewogICAgICBjb25zdCBhdWRpbyA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzb3VuZCcpOwogICAgICBhdWRpby5jdXJyZW50VGltZSA9IDA7CiAgICAgIGF1ZGlvLnBsYXkoKTsKCiAgICAgIGNvbnN0IHByb2dyZXNzID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInByb2dyZXNzLWJhciIpOwogICAgICBjb25zdCBwZXJjZW50VGV4dCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJwZXJjZW50Iik7CiAgICAgIGNvbnN0IGluZm9Cb3ggPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgiaW5mbyIpOwoKICAgICAgcHJvZ3Jlc3Muc3R5bGUud2lkdGggPSAiMCUiOwogICAgICBwZXJjZW50VGV4dC50ZXh0Q29udGVudCA9IGDwn5SEIMSQYW5nIGto4bufaSDEkeG7mW5nICR7bmFtZX0uLi4gMCVgOwogICAgICBsZXQgcGVyY2VudCA9IDA7CgogICAgICBjb25zdCBpbnRlcnZhbCA9IHNldEludGVydmFsKCgpID0+IHsKICAgICAgICBpZiAocGVyY2VudCA8IDEwMCkgewogICAgICAgICAgcGVyY2VudCsrOwogICAgICAgICAgcHJvZ3Jlc3Muc3R5bGUud2lkdGggPSBwZXJjZW50ICsgIiUiOwogICAgICAgICAgcGVyY2VudFRleHQudGV4dENvbnRlbnQgPSBg4pqhIMSQYW5nIGto4bufaSDEkeG7mW5nICR7bmFtZX0uLi4gJHtwZXJjZW50fSVgOwogICAgICAgIH0gZWxzZSB7CiAgICAgICAgICBjbGVhckludGVydmFsKGludGVydmFsKTsKICAgICAgICAgIGNvbnN0IGlzQWN0aXZlID0gIWFjdGl2ZVN0YXRlc1tuYW1lXTsKICAgICAgICAgIGFjdGl2ZVN0YXRlc1tuYW1lXSA9IGlzQWN0aXZlOwogICAgICAgICAgYnV0dG9uLmNsYXNzTGlzdC50b2dnbGUoImFjdGl2ZSIsIGlzQWN0aXZlKTsKCiAgICAgICAgICBwZXJjZW50VGV4dC50ZXh0Q29udGVudCA9IGlzQWN0aXZlCiAgICAgICAgICAgID8gYOKchSAke25hbWV9IMSRw6MgQuG6rFRgCiAgICAgICAgICAgIDogYOKdjCAke25hbWV9IMSRw6MgVOG6rlRgOwoKICAgICAgICAgIGNvbnN0IHBpbmcgPSBzaW11bGF0ZVBpbmcoKTsKICAgICAgICAgIGNvbnN0IGRlc2NyaXB0aW9ucyA9IHsKICAgICAgICAgICAgIkFpbWxvY2siOiAi8J+OryBU4buxIMSR4buZbmcgaMaw4bubbmcgduG7gSBt4bulYyB0acOqdSBn4bqnbiBuaOG6pXQuIiwKICAgICAgICAgICAgIkZpeCBSdW5nIjogIvCfp4ogR2nhuqNtIGdp4bqtdCwg4buVbiDEkeG7i25oIGtodW5nIGjDrG5oLiIsCiAgICAgICAgICAgICJOaOG6uSBUw6JtIjogIvCfkqggR2nhuqNtIHJ1bmcgdMOibSBraGkgYuG6r24uIiwKICAgICAgICAgICAgIkLDoW0gxJDhuqd1IjogIvCfjq8gSOG7lyB0cuG7oyBuZ+G6r20gdsOgbyDEkeG6p3UuIiwKICAgICAgICAgICAgIlNtb290aCI6ICLwn4yAIEzDoG0gbcaw4bujdCBjaHV54buDbiDEkeG7mW5nLiIKICAgICAgICAgIH07CgogICAgICAgICAgaW5mb0JveC5pbm5lckhUTUwgPSBgCiAgICAgICAgICAgIDxzdHJvbmc+JHtuYW1lfTwvc3Ryb25nPjxicj4KICAgICAgICAgICAg8J+UjSAke2Rlc2NyaXB0aW9uc1tuYW1lXX08YnI+CiAgICAgICAgICAgIPCfk7YgUGluZzogJHtwaW5nfSBtczxicj4KICAgICAgICAgICAg4pqhIFRy4bqhbmcgdGjDoWk6IDxzdHJvbmc+JHtpc0FjdGl2ZSA/ICfEkEFORyBC4bqsVCcgOiAnxJBBTkcgVOG6rlQnfTwvc3Ryb25nPgogICAgICAgICAgYDsKICAgICAgICB9CiAgICAgIH0sIDE1KTsKICAgIH0KICA8L3NjcmlwdD4KPC9ib2R5Pgo8L2h0bWw+Cg=="></iframe>
+
+<div class="marquee">
+  <span>📢 MenuLock Pro - Bản Quyền TikTok: Tabi.h4x - FaceBook: Minh Duc ()Tabi)</span>
+</div>
+
+<div class="bubble-btn" onclick="toggleMenu()">☰</div>
+
+<div class="menu-container" id="menuLock">
+  <h2>🔐 MenuLock Pro </h2>
+
+  <div class="box">
+    <strong>📌 Các chức năng:</strong>
+    <div class="switch-group">
+      <span>FIXRUNG</span>
+      <button class="btn-toggle" onclick="toggleFunction(this, 'FIXRUNG')">Tắt</button>
+    </div>
+    <p class="note">Giảm rung vũ khí khi bắn. Ổn định tâm và khử giật nhẹ.</p>
+
+    <div class="switch-group">
+      <span>SENSIVITY</span>
+      <button class="btn-toggle" onclick="toggleFunction(this, 'SENSIVITY')">Tắt</button>
+    </div>
+    <p class="note">Tăng độ nhạy đặc biệt cho iOS. Kéo tâm cực mượt, hỗ trợ headshot.</p>
+
+    <div class="switch-group">
+      <span>AIMBOT 90%</span>
+      <button class="btn-toggle" onclick="toggleFunction(this, 'AIMBOT 90%')">Tắt</button>
+    </div>
+    <p class="note">Hỗ trợ khoá tâm 90%. .</p>
+
+    <div class="switch-group">
+      <span>FAKEAIM</span>
+      <button class="btn-toggle" onclick="toggleFunction(this, 'FAKEAIM')">Tắt</button>
+    </div>
+    <p class="note">Giả lập auto aim siêu nhẹ. Tăng tỉ lệ bắn trúng địch.</p>
+  </div>
+
+  <div class="box">
+    <strong>📊 Phân tích trạng thái:</strong>
+    <div id="statusArea" class="status-log">
+      - FIXRUNG: Tắt<br>
+      - SENSIVITY: Tắt<br>
+      - AIMBOT 90%: Tắt<br>
+      - FAKEAIM: Tắt
+    </div>
+  </div>
+
+  <div class="box">
+    <strong>⚠️ Lưu ý:</strong>
+    <div class="note">
+      <span>✅ Hoạt động ổn định trên iOS 14 - 18</span>
+      <span>✅ Tương thích iPhone X, XR, XS, 11, 12, 13, 14, 15 series</span>
+      <span>❌ Không cần jailbreak, không can thiệp hệ thống</span>
+      <span>🎯 Chỉ hỗ trợ kéo tâm, không hack đạn, xuyên tường...</span>
+      <span>📞 Hỗ trợ Zalo: <strong>0356596850</strong></span>
+    </div>
+  </div>
+</div>
+<script>
+  const status = {
+    'FIXRUNG': false,
+    'SENSIVITY': false,
+    'AIMBOT 90%': false,
+    'FAKEAIM': false
+  };
+
+  const links = {
+    'FIXRUNG': 'fixrung.dat',
+    'SENSIVITY': 'sensivity.dat',
+    'AIMBOT 90%': 'aimbot90.dat',
+    'FAKEAIM': 'fakeaim.dat'
+  };
+
+  function toggleMenu() {
+    const menu = document.getElementById('menuLock');
+    if (menu.classList.contains('show')) {
+      menu.classList.remove('show');
+      setTimeout(() => menu.style.display = 'none', 300);
+    } else {
+      menu.style.display = 'block';
+      setTimeout(() => menu.classList.add('show'), 10);
+    }
+  }
+
+  function toggleFunction(btn, name) {
+    status[name] = !status[name];
+    btn.classList.toggle('active');
+    btn.innerText = status[name] ? 'Bật' : 'Tắt';
+    updateStatusText();
+
+    if (status[name]) {
+      // Mở file .dat tương ứng
+      window.open(links[name], '_blank');
+    }
+  }
+
+  function updateStatusText() {
+    let html = '';
+    for (const key in status) {
+      html += `- ${key}: ${status[key] ? 'Bật ✅' : 'Tắt ❌'}<br>`;
+    }
+    document.getElementById('statusArea').innerHTML = html;
+  }
+</script>
+
 </body>
 </html>
